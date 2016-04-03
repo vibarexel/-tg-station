@@ -384,12 +384,12 @@
 	dat = ""
 
 /obj/item/toy/crayon/proc/crayon_text_strip(text)
-	var/list/base = splittext(lowertext(text),"")
+	var/list/base = char_split(lowertext(text))
 	var/list/out = list()
 	for(var/a in base)
 		if(a in (letters|numerals))
 			out += a
-	return jointext(out, null)
+	return jointext(out,"")
 
 /obj/item/toy/crayon/Topic(href, href_list, hsrc)
 	var/temp = "a"
@@ -864,17 +864,17 @@
 			M.put_in_hands(src)
 			usr << "<span class='notice'>You pick up the deck.</span>"
 
-		else if(istype(over_object, /obj/screen))
-			switch(over_object.name)
-				if("l_hand")
-					if(!remove_item_from_storage(M))
-						M.unEquip(src)
-					M.put_in_l_hand(src)
-				else if("r_hand")
-					if(!remove_item_from_storage(M))
-						M.unEquip(src)
+		else if(istype(over_object, /obj/screen/inventory/hand))
+			var/obj/screen/inventory/hand/H = over_object
+			if(!remove_item_from_storage(M))
+				M.unEquip(src)
+			switch(H.slot_id)
+				if(slot_r_hand)
 					M.put_in_r_hand(src)
-				usr << "<span class='notice'>You pick up the deck.</span>"
+				if(slot_l_hand)
+					M.put_in_l_hand(src)
+			usr << "<span class='notice'>You pick up the deck.</span>"
+
 	else
 		usr << "<span class='warning'>You can't reach it from here!</span>"
 
@@ -1131,7 +1131,7 @@
 /obj/item/toy/minimeteor/throw_impact(atom/hit_atom)
 	if(!..())
 		playsound(src, 'sound/effects/meteorimpact.ogg', 40, 1)
-		for(var/mob/M in ultra_range(10, src))
+		for(var/mob/M in urange(10, src))
 			if(!M.stat && !istype(M, /mob/living/silicon/ai))\
 				shake_camera(M, 3, 1)
 		qdel(src)
@@ -1178,7 +1178,7 @@
 		cooldown = (world.time + 300) // Sets cooldown at 30 seconds
 		user.visible_message("<span class='warning'>[user] presses the big red button.</span>", "<span class='notice'>You press the button, it plays a loud noise!</span>", "<span class='italics'>The button clicks loudly.</span>")
 		playsound(src, 'sound/effects/explosionfar.ogg', 50, 0, surround = 0)
-		for(var/mob/M in ultra_range(10, src)) // Checks range
+		for(var/mob/M in urange(10, src)) // Checks range
 			if(!M.stat && !istype(M, /mob/living/silicon/ai)) // Checks to make sure whoever's getting shaken is alive/not the AI
 				sleep(8) // Short delay to match up with the explosion sound
 				shake_camera(M, 2, 1) // Shakes player camera 2 squares for 1 second.

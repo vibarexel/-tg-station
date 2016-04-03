@@ -189,7 +189,7 @@
 		if(STUTTER)
 			stuttering = max(stuttering,(effect/(blocked+1)))
 		if(EYE_BLUR)
-			set_blurriness(max(eye_blurry,(effect/(blocked+1))))
+			blur_eyes(effect/(blocked+1))
 		if(DROWSY)
 			drowsyness = max(drowsyness,(effect/(blocked+1)))
 	updatehealth()
@@ -368,7 +368,8 @@
 	diagsensor.add_hud_to(src)
 
 /mob/living/silicon/proc/sensor_mode()
-	set name = "Set Sensor Augmentation"
+	if(incapacitated())
+		return
 	var/sensor_type = input("Please select sensor type.", "Sensor Integration", null) in list("Security", "Medical","Diagnostic","Disable")
 	remove_med_sec_hud()
 	switch(sensor_type)
@@ -485,3 +486,34 @@
 	if(changed)
 		animate(src, transform = ntransform, time = 2,easing = EASE_IN|EASE_OUT)
 	return ..()
+
+
+/mob/living/silicon/Stun(amount)
+	if(status_flags & CANSTUN)
+		stunned = max(max(stunned,amount),0) //can't go below 0, getting a low amount of stun doesn't lower your current stun
+		update_stat()
+
+/mob/living/silicon/SetStunned(amount) //if you REALLY need to set stun to a set amount without the whole "can't go below current stunned"
+	if(status_flags & CANSTUN)
+		stunned = max(amount,0)
+		update_stat()
+
+/mob/living/silicon/AdjustStunned(amount)
+	if(status_flags & CANSTUN)
+		stunned = max(stunned + amount,0)
+		update_stat()
+
+/mob/living/silicon/Weaken(amount, ignore_canweaken = 0)
+	if(status_flags & CANWEAKEN || ignore_canweaken)
+		weakened = max(max(weakened,amount),0)
+		update_stat()
+
+/mob/living/silicon/SetWeakened(amount)
+	if(status_flags & CANWEAKEN)
+		weakened = max(amount,0)
+		update_stat()
+
+/mob/living/silicon/AdjustWeakened(amount, ignore_canweaken = 0)
+	if(status_flags & CANWEAKEN || ignore_canweaken)
+		weakened = max(weakened + amount,0)
+		update_stat()

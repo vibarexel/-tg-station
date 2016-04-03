@@ -31,17 +31,22 @@
 			animation.master = holder
 			target.ExtinguishMob()
 			if(target.buckled)
-				target.buckled.unbuckle_mob()
+				target.buckled.unbuckle_mob(target,force=1)
 			if(target.pulledby)
 				target.pulledby.stop_pulling()
 			target.stop_pulling()
-			if(target.buckled_mob)
-				target.unbuckle_mob(force=1)
+			if(target.buckled_mobs.len)
+				target.unbuckle_all_mobs(force=1)
 			jaunt_disappear(animation, target)
 			target.loc = holder
+			target.reset_perspective(holder)
 			target.notransform=0 //mob is safely inside holder now, no need for protection.
 			jaunt_steam(mobloc)
+
+			mute(target)
 			sleep(jaunt_duration)
+			unmute(target)
+
 			if(target.loc != holder) //mob warped out of the warp
 				qdel(holder)
 				return
@@ -52,18 +57,42 @@
 			holder.reappearing = 1
 			playsound(get_turf(user), 'sound/magic/Ethereal_Exit.ogg', 50, 1, -1)
 			sleep(20)
-			jaunt_reappear(animation, target)
+			if(!qdeleted(target))
+				jaunt_reappear(animation, target)
 			sleep(5)
-			if(mobloc.density)
-				for(var/direction in list(1,2,4,8,5,6,9,10))
-					var/turf/T = get_step(mobloc, direction)
-					if(T)
-						if(target.Move(T))
-							break
-			target.canmove = 1
-			target.client.eye = target
 			qdel(animation)
 			qdel(holder)
+			if(!qdeleted(target))
+				if(mobloc.density)
+					for(var/direction in list(1,2,4,8,5,6,9,10))
+						var/turf/T = get_step(mobloc, direction)
+						if(T)
+							if(target.Move(T))
+								break
+				target.canmove = 1
+
+//Silence wizard during jaunt so they cannot spell cast while invisible
+/obj/effect/proc_holder/spell/targeted/ethereal_jaunt/proc/mute(target)
+	if(!istype(target, /mob/living/carbon))
+		return FALSE
+
+	var/mob/living/carbon/mob_to_mute = target
+	if(!mob_to_mute.dna)
+		return FALSE
+	
+	mob_to_mute.dna.add_mutation(MUT_MUTE)
+	return TRUE
+
+/obj/effect/proc_holder/spell/targeted/ethereal_jaunt/proc/unmute(target)
+	if(!istype(target, /mob/living/carbon))
+		return FALSE
+
+	var/mob/living/carbon/mob_to_mute = target
+	if(!mob_to_mute.dna)
+		return FALSE
+	
+	mob_to_mute.dna.remove_mutation(MUT_MUTE)
+	return TRUE
 
 /obj/effect/proc_holder/spell/targeted/ethereal_jaunt/proc/jaunt_disappear(atom/movable/overlay/animation, mob/living/target)
 	animation.icon_state = "liquify"
@@ -93,7 +122,7 @@
 /obj/effect/dummy/spell_jaunt/Destroy()
 	// Eject contents if deleted somehow
 	for(var/atom/movable/AM in src)
-		AM.loc = get_turf(src)
+		AM.forceMove(get_turf(src))
 	return ..()
 
 /obj/effect/dummy/spell_jaunt/relaymove(var/mob/user, direction)

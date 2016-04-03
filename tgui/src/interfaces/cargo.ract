@@ -1,24 +1,14 @@
 <script>
-  import { filterMulti } from 'util/filter'
   component.exports = {
-    data: {
-      filter: ''
-    },
-    oninit () {
-      this.observe('filter', (newkey, oldkey, keypath) => {
-        const categories = this.findAll('.display:nth-child(n+4)')
-        filterMulti(categories, this.get('filter').toLowerCase())
-      }, { init: false })
+    computed: {
+      tabs () {
+        return Object.keys(this.get('data.supplies'))
+      }
     }
   }
 </script>
 
-<ui-display title='Cargo' button>
-  {{#partial button}}
-    {{#if config.fancy}}
-      <ui-input value='{{filter}}' placeholder='Filter...'/>
-    {{/if}}
-  {{/partial}}
+<ui-display title='Cargo'>
   <ui-section label='Shuttle'>
     {{#if data.docked && !data.requestonly}}
       <ui-button action='send'>{{data.location}}</ui-button>
@@ -26,7 +16,7 @@
       <span>{{data.location}}</span>
     {{/if}}
   </ui-section>
-  <ui-section label='Points'>
+  <ui-section label='Credits'>
     <span>{{Math.floor(adata.points)}}</span>
   </ui-section>
   <ui-section label='Centcom Message'>
@@ -51,7 +41,7 @@
       <ui-section candystripe nowrap>
         <div class='content'>#{{id}}</div>
         <div class='content'>{{object}}</div>
-        <div class='content'>{{cost}} Points</div>
+        <div class='content'>{{cost}} Credits</div>
         <div class='content'>
           <ui-button icon='minus' action='remove' params='{"id": "{{id}}"}'/>
         </div>
@@ -71,9 +61,9 @@
     <ui-section candystripe nowrap>
       <div class='content'>#{{id}}</div>
       <div class='content'>{{object}}</div>
-      <div class='content'>{{cost}} Points</div>
-      <div class='content'>By {{orderedby}}</div>
-      <div class='content'>Comment: {{comment}}</div>
+      <div class='content'>{{cost}} Credits</div>
+      <div class='content'>By {{orderer}}</div>
+      <div class='content'>Comment: {{reason}}</div>
       {{#if !data.requestonly}}
         <div class='content'>
           <ui-button icon='check' action='approve' params='{"id": "{{id}}"}'/>
@@ -85,12 +75,14 @@
       <span>No Requests</span>
     {{/each}}
 </ui-display>
-{{#each data.supplies}}
-  <ui-display title='{{name}}'>
-    {{#each packs}}
-      <ui-section label='{{name}}' candystripe right>
-        <ui-button action='add' params='{"id": "{{id}}"}'>{{cost}} Points</ui-button>
-      </ui-section>
-    {{/each}}
-  </ui-display>
-{{/each}}
+<ui-tabs tabs='{{tabs}}'>
+  {{#each data.supplies}}
+    <tab name='{{name}}'>
+      {{#each packs}}
+        <ui-section label='{{name}}' candystripe right>
+          <ui-button action='add' params='{"id": "{{id}}"}'>{{cost}} Credits</ui-button>
+        </ui-section>
+      {{/each}}
+    </tab>
+  {{/each}}
+</ui-tabs>

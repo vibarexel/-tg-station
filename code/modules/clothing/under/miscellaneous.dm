@@ -490,6 +490,16 @@
 	can_adjust = 1
 	alt_covers_chest = 1
 
+/obj/item/clothing/under/plaid_skirt/green
+	name = "green plaid skirt"
+	desc = "A preppy green skirt with a white blouse."
+	icon_state = "plaid_green"
+	item_state = "plaid_green"
+	item_color = "plaid_green"
+	fitted = FEMALE_UNIFORM_TOP
+	can_adjust = 1
+	alt_covers_chest = 1
+
 /obj/item/clothing/under/jester
 	name = "jester suit"
 	desc = "A jolly dress, well suited to entertain your master, nuncle."
@@ -521,7 +531,7 @@
 	if(!istype(H))
 		return
 
-	if(H.fire_stacks)
+	if(H.on_fire)
 		if(extinguishes_left)
 			if(next_extinguish > world.time)
 				return
@@ -549,4 +559,11 @@
 	name = "Plasma-man jumpsuit refill pack"
 	desc = "A compressed water pack used to refill plasma-man jumpsuit auto-extinguishers."
 	icon_state = "plasmarefill"
+
+/obj/item/clothing/under/rank/security/navyblue/russian
+	name = "russian officer's uniform"
+	desc = "The latest in fashionable russian outfits."
+	icon_state = "hostanclothes"
+	item_state = "hostanclothes"
+	item_color = "hostanclothes"
 

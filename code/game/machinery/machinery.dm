@@ -117,18 +117,24 @@ Class Procs:
 	var/unsecuring_tool = /obj/item/weapon/wrench
 	var/interact_open = 0 // Can the machine be interacted with when in maint/when the panel is open.
 	var/interact_offline = 0 // Can the machine be interacted with while de-powered.
+	var/speed_process = 0 // Process as fast as possible?
 
 /obj/machinery/New()
 	..()
 	machines += src
-	SSmachine.processing += src
+	if(!speed_process)
+		SSmachine.processing += src
+	else
+		SSfastprocess.processing += src
 	power_change()
 
 /obj/machinery/Destroy()
 	machines.Remove(src)
-	SSmachine.processing -= src
-	if(occupant)
-		dropContents()
+	if(!speed_process)
+		SSmachine.processing -= src
+	else
+		SSfastprocess.processing -= src
+	dropContents()
 	return ..()
 
 /obj/machinery/attackby(obj/item/weapon/W, mob/user, params)
@@ -160,21 +166,25 @@ Class Procs:
 
 /obj/machinery/proc/dropContents()
 	var/turf/T = get_turf(src)
+	for(var/mob/living/L in src)
+		L.loc = T
+		L.reset_perspective(null)
+		L.update_canmove() //so the mob falls if he became unconscious inside the machine.
+		. += L
+
 	T.contents += contents
-	if(occupant)
-		occupant.reset_perspective(null)
-		occupant = null
+	occupant = null
 
 /obj/machinery/proc/close_machine(mob/living/target = null)
 	state_open = 0
 	density = 1
 	if(!target)
 		for(var/mob/living/carbon/C in loc)
-			if(C.buckled || C.buckled_mob)
+			if(C.buckled || C.buckled_mobs.len)
 				continue
 			else
 				target = C
-	if(target && !target.buckled && !target.buckled_mob)
+	if(target && !target.buckled && !target.buckled_mobs.len)
 		occupant = target
 		target.forceMove(src)
 	updateUsrDialog()
@@ -259,7 +269,6 @@ Class Procs:
 			user << "<span class='warning'>You momentarily forget how to use [src]!</span>"
 			return 1
 	if(!is_interactable())
-		user << "<span class='danger'>\The [src] seems offline.</span>"
 		return 1
 	if(set_machine)
 		user.set_machine(src)
@@ -403,3 +412,15 @@ Class Procs:
 
 /obj/machinery/proc/can_be_overridden()
 	. = 1
+
+
+/obj/machinery/tesla_act(var/power)
+	..()
+	if(prob(85))
+		emp_act(2)
+	else if(prob(50))
+		ex_act(3)
+	else if(prob(90))
+		ex_act(2)
+	else
+		ex_act(1)

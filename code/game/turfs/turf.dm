@@ -36,11 +36,8 @@
 
 /turf/Destroy()
 	// Adds the adjacent turfs to the current atmos processing
-	for(var/direction in cardinal)
-		if(atmos_adjacent_turfs & direction)
-			var/turf/simulated/T = get_step(src, direction)
-			if(istype(T))
-				SSair.add_to_active(T)
+	for(var/turf/simulated/T in atmos_adjacent_turfs)
+		SSair.add_to_active(T)
 	..()
 	return QDEL_HINT_HARDDEL_NOW
 
@@ -126,19 +123,12 @@
 
 	SSair.remove_from_active(src)
 
-	var/s_appearance = appearance
-	var/nocopy = density || smooth //dont copy walls or smooth turfs
-
 	var/turf/W = new path(src)
 	if(istype(W, /turf/simulated))
 		W:Assimilate_Air()
 		W.RemoveLattice()
 	W.levelupdate()
 	W.CalculateAdjacentTurfs()
-
-	if(W.smooth & SMOOTH_DIAGONAL)
-		if(!W.apply_fixed_underlay())
-			W.underlays += !nocopy ? s_appearance : DEFAULT_UNDERLAY_IMAGE
 
 	if(!can_have_cabling())
 		for(var/obj/structure/cable/C in contents)
@@ -238,7 +228,6 @@
 /turf/handle_slip(mob/living/carbon/C, s_amount, w_amount, obj/O, lube)
 	if(has_gravity(src))
 		var/obj/buckled_obj
-		var/oldlying = C.lying
 		if(C.buckled)
 			buckled_obj = C.buckled
 			if(!(lube&GALOSHES_DONT_HELP)) //can't slip while buckled unless it's lube.
@@ -262,16 +251,13 @@
 		C.Weaken(w_amount)
 		C.stop_pulling()
 		if(buckled_obj)
-			buckled_obj.unbuckle_mob()
+			buckled_obj.unbuckle_mob(C)
 			step(buckled_obj, olddir)
 		else if(lube&SLIDE)
 			for(var/i=1, i<5, i++)
 				spawn (i)
 					step(C, olddir)
 					C.spin(1,1)
-		if(C.lying != oldlying && lube) //did we actually fall?
-			var/dam_zone = pick("chest", "l_hand", "r_hand", "l_leg", "r_leg")
-			C.apply_damage(5, BRUTE, dam_zone)
 		return 1
 
 /turf/singularity_act()
@@ -293,23 +279,6 @@
 /turf/proc/visibilityChanged()
 	if(ticker)
 		cameranet.updateVisibility(src)
-
-/turf/proc/apply_fixed_underlay()
-	if(!fixed_underlay)
-		return
-	var/obj/O = new
-	O.layer = layer
-	if(fixed_underlay["icon"])
-		O.icon = fixed_underlay["icon"]
-		O.icon_state = fixed_underlay["icon_state"]
-	else if(fixed_underlay["space"])
-		O.icon = 'icons/turf/space.dmi'
-		O.icon_state = SPACE_ICON_STATE
-	else
-		O.icon = DEFAULT_UNDERLAY_ICON
-		O.icon_state = DEFAULT_UNDERLAY_ICON_STATE
-	underlays += O
-	return 1
 
 /turf/indestructible
 	name = "wall"
@@ -338,7 +307,7 @@
 /turf/indestructible/riveted/New()
 	..()
 	if(smooth)
-		smooth_icon(src)
+		queue_smooth(src)
 		icon_state = ""
 
 /turf/indestructible/riveted/uranium
@@ -348,6 +317,9 @@
 
 /turf/indestructible/abductor
 	icon_state = "alien1"
+
+/turf/indestructible/opshuttle
+	icon_state = "wall3"
 
 /turf/indestructible/fakeglass
 	name = "window"

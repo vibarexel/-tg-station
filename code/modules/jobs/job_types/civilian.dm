@@ -26,10 +26,16 @@ Clown
 	mask = /obj/item/clothing/mask/gas/clown_hat
 	l_pocket = /obj/item/weapon/bikehorn
 	r_pocket = /obj/item/toy/crayon/rainbow
-	backpack_contents = list(/obj/item/weapon/stamp/clown=1,/obj/item/weapon/reagent_containers/spray/waterflower=1)
+	backpack_contents = list(
+		/obj/item/weapon/stamp/clown = 1,
+		/obj/item/weapon/reagent_containers/spray/waterflower = 1,
+		/obj/item/weapon/reagent_containers/food/snacks/grown/banana = 1,
+		/obj/item/weapon/skub = 1
+		)
 
 	backpack = /obj/item/weapon/storage/backpack/clown
 	satchel = /obj/item/weapon/storage/backpack/clown
+	dufflebag = /obj/item/weapon/storage/backpack/dufflebag/clown //strangely has a duffle
 
 /datum/outfit/job/clown/pre_equip(mob/living/carbon/human/H, visualsOnly = FALSE)
 	..()
@@ -44,8 +50,6 @@ Clown
 
 	if(visualsOnly)
 		return
-
-	new /obj/item/weapon/reagent_containers/food/snacks/grown/banana(H.back, 50)
 
 	H.dna.add_mutation(CLOWNMUT)
 	H.rename_self("clown")
@@ -83,6 +87,7 @@ Mime
 
 	backpack = /obj/item/weapon/storage/backpack/mime
 	satchel = /obj/item/weapon/storage/backpack/mime
+
 
 /datum/outfit/job/mime/post_equip(mob/living/carbon/human/H, visualsOnly = FALSE)
 	..()

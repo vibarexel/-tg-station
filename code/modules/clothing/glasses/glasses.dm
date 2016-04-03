@@ -10,9 +10,9 @@
 			if(H.glasses == src)
 				H << "<span class='danger'>The [src] overloads and blinds you!</span>"
 				H.flash_eyes(visual = 1)
-				H.set_blindness(3)
-				H.set_blurriness(5)
-				H.adjust_eye_stat(5)
+				H.blind_eyes(3)
+				H.blur_eyes(5)
+				H.adjust_eye_damage(5)
 
 /obj/item/clothing/glasses/meson
 	name = "Optical Meson Scanner"
@@ -50,16 +50,11 @@
 	item_state = "glasses"
 	origin_tech = "magnets=2;engineering=2"
 	scan_reagents = 1 //You can see reagents while wearing science goggles
+	actions_types = list(/datum/action/item_action/toggle_research_scanner)
 
-/obj/item/clothing/glasses/science/equipped(mob/user, slot)
+/obj/item/clothing/glasses/science/item_action_slot_check(slot)
 	if(slot == slot_glasses)
-		user.scanner.devices += 1
-		user.scanner.Grant(user)
-	..(user, slot)
-
-/obj/item/clothing/glasses/science/dropped(mob/user)
-	user.scanner.devices = max(0, user.scanner.devices - 1)
-	..()
+		return 1
 
 /obj/item/clothing/glasses/night
 	name = "Night Vision Goggles"
@@ -89,7 +84,26 @@
 	item_state = "glasses"
 	origin_tech = "magnets=3;engineering=3"
 	vision_flags = SEE_OBJS
-	invis_view = SEE_INVISIBLE_MINIMUM
+
+/obj/item/clothing/glasses/material/mining
+	name = "Optical Material Scanner"
+	desc = "Used by miners to detect ores deep within the rock."
+	icon_state = "material"
+	item_state = "glasses"
+	origin_tech = "magnets=3;engineering=3"
+	darkness_view = 0
+
+/obj/item/clothing/glasses/material/mining/gar
+	name = "gar material scanner"
+	icon_state = "garm"
+	item_state = "garm"
+	desc = "Do the impossible, see the invisible!"
+	force = 10
+	throwforce = 20
+	throw_speed = 4
+	attack_verb = list("sliced")
+	hitsound = 'sound/weapons/bladeslice.ogg'
+	sharpness = IS_SHARP
 
 /obj/item/clothing/glasses/regular
 	name = "Prescription Glasses"
@@ -170,7 +184,7 @@
 	desc = "Protects the eyes from welders; approved by the mad scientist association."
 	icon_state = "welding-g"
 	item_state = "welding-g"
-	action_button_name = "Toggle Welding Goggles"
+	actions_types = list(/datum/action/item_action/toggle)
 	materials = list(MAT_METAL = 250)
 	flash_protect = 2
 	tint = 2

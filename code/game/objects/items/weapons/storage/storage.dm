@@ -51,15 +51,18 @@
 				return
 
 			playsound(loc, "rustle", 50, 1, -5)
-			switch(over_object.name)
-				if("r_hand")
-					if(!M.unEquip(src))
-						return
-					M.put_in_r_hand(src)
-				if("l_hand")
-					if(!M.unEquip(src))
-						return
-					M.put_in_l_hand(src)
+
+
+			if(istype(over_object, /obj/screen/inventory/hand))
+				var/obj/screen/inventory/hand/H = over_object
+				if(!M.unEquip(src))
+					return
+				switch(H.slot_id)
+					if(slot_r_hand)
+						M.put_in_r_hand(src)
+					if(slot_l_hand)
+						M.put_in_l_hand(src)
+
 			add_fingerprint(usr)
 
 //Check if this storage can dump the items
@@ -95,18 +98,17 @@
 
 
 /obj/item/weapon/storage/proc/show_to(mob/user)
+	if(!user.client)
+		return
 	if(user.s_active != src && (user.stat == CONSCIOUS))
 		for(var/obj/item/I in src)
 			if(I.on_found(user))
 				return
 	if(user.s_active)
 		user.s_active.hide_from(user)
-	user.client.screen -= boxes
-	user.client.screen -= closer
-	user.client.screen -= contents
-	user.client.screen += boxes
-	user.client.screen += closer
-	user.client.screen += contents
+	user.client.screen |= boxes
+	user.client.screen |= closer
+	user.client.screen |= contents
 	user.s_active = src
 	is_seeing |= user
 
@@ -114,7 +116,6 @@
 /obj/item/weapon/storage/throw_at(atom/target, range, speed, mob/thrower, spin)
 	close_all()
 	return ..()
-
 
 /obj/item/weapon/storage/proc/hide_from(mob/user)
 	if(!user.client)
@@ -376,11 +377,12 @@
 	handle_item_insertion(W, 0 , user)
 	return 1
 
-
-/obj/item/weapon/storage/dropped(mob/user)
-	return
-
 /obj/item/weapon/storage/attack_hand(mob/user)
+	if(user.s_active == src && loc == user) //if you're already looking inside the storage item
+		user.s_active.close(user)
+		close(user)
+		return
+
 	playsound(loc, "rustle", 50, 1, -5)
 
 	if(ishuman(user))
@@ -464,7 +466,7 @@
 	boxes.layer = 19
 	closer = new /obj/screen/close()
 	closer.master = src
-	closer.icon_state = "x"
+	closer.icon_state = "backpack_close"
 	closer.layer = 20
 	orient2hud()
 

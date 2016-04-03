@@ -25,9 +25,15 @@
 	nodamage = 0
 
 /obj/item/projectile/magic/fireball/Range()
-	var/mob/living/L = locate(/mob/living) in (range(src, 1) - firer)
+	var/turf/T1 = get_step(src,turn(dir, -45))
+	var/turf/T2 = get_step(src,turn(dir, 45))
+	var/mob/living/L = locate(/mob/living) in T1 //if there's a mob alive in our front right diagonal, we hit it.
 	if(L && L.stat != DEAD)
 		Bump(L) //Magic Bullet #teachthecontroversy
+		return
+	L = locate(/mob/living) in T2
+	if(L && L.stat != DEAD)
+		Bump(L)
 		return
 	..()
 
@@ -49,18 +55,15 @@
 /obj/item/projectile/magic/resurrection/on_hit(mob/living/carbon/target)
 	. = ..()
 	if(ismob(target))
-		var/old_stat = target.stat
-		target.revive()
-		target.suiciding = 0
-		if(!target.ckey)
-			for(var/mob/dead/observer/ghost in player_list)
-				if(target.real_name == ghost.real_name)
-					ghost.reenter_corpse()
-					break
-		if(old_stat != DEAD)
-			target << "<span class='notice'>You feel great!</span>"
-		else
+		if(target.revive(full_heal = 1))
+			if(!target.ckey)
+				for(var/mob/dead/observer/ghost in player_list)
+					if(target.real_name == ghost.real_name)
+						ghost.reenter_corpse()
+						break
 			target << "<span class='notice'>You rise with a start, you're alive!!!</span>"
+		else if(target.stat != DEAD)
+			target << "<span class='notice'>You feel great!</span>"
 
 /obj/item/projectile/magic/teleport
 	name = "bolt of teleportation"
@@ -164,7 +167,6 @@
 						new_mob.invisibility = 0
 						new_mob.job = "Cyborg"
 						var/mob/living/silicon/robot/Robot = new_mob
-						Robot.mmi = new /obj/item/device/mmi(new_mob)
 						Robot.mmi.transfer_identity(M)	//Does not transfer key/client.
 					else
 						new_mob.languages |= HUMAN
@@ -300,6 +302,9 @@
 				S.name = "statue of [H.name]"
 				S.faction = list("\ref[firer]")
 				S.icon = change.icon
+				S.icon_state = change.icon_state
+				S.overlays = change.overlays
+				S.color = change.color
 				if(H.mind)
 					H.mind.transfer_to(S)
 					S << "<span class='userdanger'>You are an animate statue. You cannot move when monitored, but are nearly invincible and deadly when unobserved! Do not harm [firer.name], your creator.</span>"

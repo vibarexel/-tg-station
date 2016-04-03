@@ -76,15 +76,6 @@ Please contact me on #coderbus IRC. ~Carnie x
 
 //HAIR OVERLAY
 /mob/living/carbon/human/update_hair()
-	//Reset our hair
-	remove_overlay(HAIR_LAYER)
-
-	if( (disabilities & HUSK) || (head && (head.flags & BLOCKHAIR)) || (wear_mask && (wear_mask.flags & BLOCKHAIR)) )
-		return
-
-	if((wear_suit) && (wear_suit.hooded) && (wear_suit.suittoggled == 1))
-		return
-
 	dna.species.handle_hair(src)
 
 /mob/living/carbon/human/proc/update_mutcolor()
@@ -164,6 +155,10 @@ Please contact me on #coderbus IRC. ~Carnie x
 /mob/living/carbon/human/update_inv_w_uniform()
 	remove_overlay(UNIFORM_LAYER)
 
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_w_uniform]
+		inv.update_icon()
+
 	if(istype(w_uniform, /obj/item/clothing/under))
 		var/obj/item/clothing/under/U = w_uniform
 		if(client && hud_used && hud_used.hud_shown)
@@ -201,6 +196,11 @@ Please contact me on #coderbus IRC. ~Carnie x
 
 /mob/living/carbon/human/update_inv_wear_id()
 	remove_overlay(ID_LAYER)
+
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_wear_id]
+		inv.update_icon()
+
 	if(wear_id)
 		if(client && hud_used && hud_used.hud_shown)
 			wear_id.screen_loc = ui_id
@@ -215,6 +215,11 @@ Please contact me on #coderbus IRC. ~Carnie x
 
 /mob/living/carbon/human/update_inv_gloves()
 	remove_overlay(GLOVES_LAYER)
+
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_gloves]
+		inv.update_icon()
+
 	if(gloves)
 		if(client && hud_used && hud_used.hud_shown)
 			if(hud_used.inventory_shown)			//if the inventory is open ...
@@ -240,13 +245,17 @@ Please contact me on #coderbus IRC. ~Carnie x
 /mob/living/carbon/human/update_inv_glasses()
 	remove_overlay(GLASSES_LAYER)
 
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_glasses]
+		inv.update_icon()
+
 	if(glasses)
 		if(client && hud_used && hud_used.hud_shown)
 			if(hud_used.inventory_shown)			//if the inventory is open ...
 				glasses.screen_loc = ui_glasses		//...draw the item in the inventory screen
 			client.screen += glasses				//Either way, add the item to the HUD
 
-		if(!(head && (head.flags_inv & HIDEEYES)))
+		if(!(head && (head.flags_inv & HIDEEYES)) && !(wear_mask && (wear_mask.flags_inv & HIDEEYES)))
 
 			var/image/standing = glasses.build_worn_icon(state = glasses.icon_state, default_layer = GLASSES_LAYER, default_icon_file = 'icons/mob/eyes.dmi')
 			overlays_standing[GLASSES_LAYER] = standing
@@ -256,6 +265,10 @@ Please contact me on #coderbus IRC. ~Carnie x
 
 /mob/living/carbon/human/update_inv_ears()
 	remove_overlay(EARS_LAYER)
+
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_ears]
+		inv.update_icon()
 
 	if(ears)
 		if(client && hud_used && hud_used.hud_shown)
@@ -272,6 +285,10 @@ Please contact me on #coderbus IRC. ~Carnie x
 /mob/living/carbon/human/update_inv_shoes()
 	remove_overlay(SHOES_LAYER)
 
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_shoes]
+		inv.update_icon()
+
 	if(shoes)
 		if(client && hud_used && hud_used.hud_shown)
 			if(hud_used.inventory_shown)			//if the inventory is open ...
@@ -286,6 +303,10 @@ Please contact me on #coderbus IRC. ~Carnie x
 
 /mob/living/carbon/human/update_inv_s_store()
 	remove_overlay(SUIT_STORE_LAYER)
+
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_s_store]
+		inv.update_icon()
 
 	if(s_store)
 		if(client && hud_used && hud_used.hud_shown)
@@ -303,17 +324,25 @@ Please contact me on #coderbus IRC. ~Carnie x
 
 /mob/living/carbon/human/update_inv_head()
 	..()
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_head]
+		inv.update_icon()
+
 	update_mutant_bodyparts()
 
 
 /mob/living/carbon/human/update_inv_belt()
 	remove_overlay(BELT_LAYER)
 
-	if(belt)
-		if(client && hud_used && hud_used.hud_shown)
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_belt]
+		inv.update_icon()
+
+		if(hud_used.hud_shown && belt)
 			client.screen += belt
 			belt.screen_loc = ui_belt
 
+	if(belt)
 		var/t_state = belt.item_state
 		if(!t_state)
 			t_state = belt.icon_state
@@ -328,6 +357,10 @@ Please contact me on #coderbus IRC. ~Carnie x
 
 /mob/living/carbon/human/update_inv_wear_suit()
 	remove_overlay(SUIT_LAYER)
+
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_wear_suit]
+		inv.update_icon()
 
 	if(istype(wear_suit, /obj/item/clothing/suit))
 		if(client && hud_used && hud_used.hud_shown)
@@ -349,19 +382,30 @@ Please contact me on #coderbus IRC. ~Carnie x
 
 
 /mob/living/carbon/human/update_inv_pockets()
-	if(l_store)
-		if(client && hud_used && hud_used.hud_shown)
-			client.screen += l_store
-			l_store.screen_loc = ui_storage1
-	if(r_store)
-		if(client && hud_used && hud_used.hud_shown)
-			client.screen += r_store
-			r_store.screen_loc = ui_storage2
+	if(client && hud_used)
+		var/obj/screen/inventory/inv
 
+		inv = hud_used.inv_slots[slot_l_store]
+		inv.update_icon()
+
+		inv = hud_used.inv_slots[slot_r_store]
+		inv.update_icon()
+
+		if(hud_used.hud_shown)
+			if(l_store)
+				client.screen += l_store
+				l_store.screen_loc = ui_storage1
+
+			if(r_store)
+				client.screen += r_store
+				r_store.screen_loc = ui_storage2
 
 
 /mob/living/carbon/human/update_inv_wear_mask()
 	..()
+	if(client && hud_used)
+		var/obj/screen/inventory/inv = hud_used.inv_slots[slot_wear_mask]
+		inv.update_icon()
 	update_mutant_bodyparts()
 
 /mob/living/carbon/human/update_inv_handcuffed()

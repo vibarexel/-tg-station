@@ -5,19 +5,11 @@
     locate(min(CENTER.x+(RADIUS),world.maxx), min(CENTER.y+(RADIUS),world.maxy), CENTER.z) \
   )
 
-//This file was auto-corrected by findeclaration.exe on 25.5.2012 20:42:31
-
-/proc/get_area(O)
-	var/atom/location = O
-	var/i
-	for(i=1, i<=20, i++)
-		if(isarea(location))
-			return location
-		else if (istype(location))
-			location = location.loc
-		else
-			return null
-	return 0
+/proc/get_area(atom/A)
+	if (!istype(A))
+		return
+	for(A, A && !isarea(A), A=A.loc); //semicolon is for the empty statement
+	return A
 
 /proc/get_area_master(O)
 	var/area/A = get_area(O)
@@ -340,13 +332,19 @@
 		for(var/client/C in show_to)
 			C.images -= I
 
-/proc/get_active_player_count()
+/proc/get_active_player_count(var/alive_check = 0, var/afk_check = 0, var/human_check = 0)
 	// Get active players who are playing in the round
 	var/active_players = 0
 	for(var/i = 1; i <= player_list.len; i++)
 		var/mob/M = player_list[i]
 		if(M && M.client)
-			if(istype(M, /mob/new_player)) // exclude people in the lobby
+			if(alive_check && M.stat)
+				continue
+			else if(afk_check && M.client.is_afk())
+				continue
+			else if(human_check && !istype(M, /mob/living/carbon/human))
+				continue
+			else if(istype(M, /mob/new_player)) // exclude people in the lobby
 				continue
 			else if(isobserver(M)) // Ghosts are fine if they were playing once (didn't start as observers)
 				var/mob/dead/observer/O = M

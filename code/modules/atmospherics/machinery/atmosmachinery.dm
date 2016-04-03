@@ -27,7 +27,7 @@ Pipelines + Other Objects -> Pipe network
 	var/device_type = 0
 	var/list/obj/machinery/atmospherics/nodes = list()
 
-/obj/machinery/atmospherics/New(process = TRUE)
+/obj/machinery/atmospherics/New(loc, process = TRUE)
 	nodes.len = device_type
 	..()
 	if(process)
@@ -45,8 +45,7 @@ Pipelines + Other Objects -> Pipe network
 		qdel(stored)
 		stored = null
 
-	for(var/mob/living/L in src)
-		L.forceMove(get_turf(src))
+	dropContents()
 	if(pipe_vision_img)
 		qdel(pipe_vision_img)
 
@@ -140,7 +139,7 @@ Pipelines + Other Objects -> Pipe network
 			user << "<span class='warning'>As you begin unwrenching \the [src] a gush of air blows in your face... maybe you should reconsider?</span>"
 			unsafe_wrenching = TRUE //Oh dear oh dear
 
-		if (do_after(user, 20/W.toolspeed, target = src) && !gc_destroyed)
+		if (do_after(user, 20/W.toolspeed, target = src) && !qdeleted(src))
 			user.visible_message( \
 				"[user] unfastens \the [src].", \
 				"<span class='notice'>You unfasten \the [src].</span>", \
@@ -238,7 +237,7 @@ Pipelines + Other Objects -> Pipe network
 	if(!(direction & initialize_directions)) //cant go this way.
 		return
 
-	if(buckled_mob == user) // fixes buckle ventcrawl edgecase fuck bug
+	if(user in buckled_mobs)// fixes buckle ventcrawl edgecase fuck bug
 		return
 
 	var/obj/machinery/atmospherics/target_move = findConnecting(direction)
@@ -278,24 +277,9 @@ Pipelines + Other Objects -> Pipe network
 /obj/machinery/atmospherics/proc/returnPipenets()
 	return list()
 
-/obj/machinery/atmospherics/onShuttleMove()
-	. = ..()
-	if(!.)
-		return
-
-	for(DEVICE_TYPE_LOOP)
-		dealWithShuttleStuff(I)
-	atmosinit() //we've moved, so what once was next to us may not be
-	build_network()
-
-/obj/machinery/atmospherics/proc/dealWithShuttleStuff(I)
-	var/obj/machinery/atmospherics/node = NODE_I
-	var/turf/node_turf = get_turf(node)
-	var/turf/self_turf = get_turf(src)
-	if(node_turf.loc != self_turf.loc) //shuttles are area based, so this means the node is not on the shuttle with us
-		node.disconnect(src)
-		NODE_I = null
-
 /obj/machinery/atmospherics/update_remote_sight(mob/user)
 	user.sight |= (SEE_TURFS|BLIND)
-	user.update_pipe_vision(src)
+
+//Used for certain children of obj/machinery/atmospherics to not show pipe vision when mob is inside it.
+/obj/machinery/atmospherics/proc/can_see_pipes()
+	return 1

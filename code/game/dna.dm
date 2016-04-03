@@ -172,11 +172,9 @@
 /mob/proc/set_species(datum/species/mrace, icon_update = 1)
 	return
 
-/mob/living/carbon/set_species(datum/species/mrace, icon_update = 1)
-	if(has_dna())
-		if(dna.species.exotic_blood)
-			var/datum/reagent/EB = dna.species.exotic_blood
-			reagents.del_reagent(initial(EB.id))
+/mob/living/carbon/set_species(datum/species/mrace = null, icon_update = 1)
+	if(mrace && has_dna())
+		dna.species.on_species_loss(src)
 		dna.species = new mrace()
 
 /mob/living/carbon/human/set_species(datum/species/mrace, icon_update = 1)
@@ -228,7 +226,8 @@
 /mob/living/carbon/proc/create_dna()
 	dna = new /datum/dna(src)
 	if(!dna.species)
-		dna.species = new /datum/species/human()
+		var/rando_race = pick(config.roundstart_races)
+		dna.species = new rando_race()
 
 //proc used to update the mob's appearance after its dna UI has been changed
 /mob/living/carbon/proc/updateappearance(icon_update=1, mutcolor_update=0, mutations_overlay_update=0)

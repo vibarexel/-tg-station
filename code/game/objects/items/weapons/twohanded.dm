@@ -87,6 +87,7 @@
 	return ..()
 
 /obj/item/weapon/twohanded/dropped(mob/user)
+	..()
 	//handles unwielding a twohanded weapon when dropped as well as clearing up the offhand
 	if(user)
 		var/obj/item/weapon/twohanded/O = user.get_inactive_hand()
@@ -306,6 +307,7 @@
 	throw_speed = 4
 	embedded_impact_pain_multiplier = 3
 	armour_penetration = 10
+	materials = list(MAT_METAL=1150, MAT_GLASS=2075)
 	hitsound = 'sound/weapons/bladeslice.ogg'
 	attack_verb = list("attacked", "poked", "jabbed", "torn", "gored")
 	sharpness = IS_SHARP
@@ -393,7 +395,7 @@
 	attack_verb = list("sawed", "torn", "cut", "chopped", "diced")
 	hitsound = "swing_hit"
 	sharpness = IS_SHARP
-	action_button_name = "Pull the starting cord"
+	actions_types = list(/datum/action/item_action/startchainsaw)
 	var/on = 0
 
 /obj/item/weapon/twohanded/required/chainsaw/attack_self(mob/user)
@@ -411,6 +413,9 @@
 	if(src == user.get_active_hand()) //update inhands
 		user.update_inv_l_hand()
 		user.update_inv_r_hand()
+	for(var/X in actions)
+		var/datum/action/A = X
+		A.UpdateButtonIcon()
 
 
 //GREY TIDE

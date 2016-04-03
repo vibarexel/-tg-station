@@ -20,27 +20,26 @@ var/datum/subsystem/shuttle/SSshuttle
 		//supply shuttle stuff
 	var/obj/docking_port/mobile/supply/supply
 	var/ordernum = 1					//order number given to next order
-	var/points = 50						//number of trade-points we have
-	var/points_per_decisecond = 0.005	//points gained every decisecond
-	var/points_per_slip = 2				//points gained per slip returned
-	var/points_per_crate = 5			//points gained per crate returned
-	var/points_per_intel = 250			//points gained per intel returned
-	var/points_per_plasma = 5			//points gained per plasma returned
-	var/points_per_design = 25			//points gained per max reliability research design returned (only for initilally unreliable designs)
+	var/points = 5000						//number of trade-points we have
+	var/points_per_manifest = 200			//points gained per manifest returned
+	var/points_per_crate = 500			//points gained per crate returned
+	var/points_per_intel = 25000			//points gained per intel returned
+	var/points_per_plasma = 500			//points gained per plasma returned
+	var/points_per_design = 2500			//points gained per max reliability research design returned (only for initilally unreliable designs)
 	var/centcom_message = ""			//Remarks from Centcom on how well you checked the last order.
 	var/list/discoveredPlants = list()	//Typepaths for unusual plants we've already sent CentComm, associated with their potencies
 	var/list/techLevels = list()
 	var/list/researchDesigns = list()
+
+	var/list/supply_packs = list()
 	var/list/shoppinglist = list()
 	var/list/requestlist = list()
-	var/list/supply_packs = list()
-	var/datum/round_event/shuttle_loan/shuttle_loan
-	var/sold_atoms = ""
+	var/list/orderhistory = list()
 
+	var/datum/round_event/shuttle_loan/shuttle_loan
 
 /datum/subsystem/shuttle/New()
 	NEW_SS_GLOBAL(SSshuttle)
-
 
 /datum/subsystem/shuttle/Initialize(timeofday, zlevel)
 	if (zlevel)
@@ -50,18 +49,19 @@ var/datum/subsystem/shuttle/SSshuttle
 	if(!supply)
 		WARNING("No /obj/docking_port/mobile/supply placed on the map!")
 
-	ordernum = rand(1,9000)
+	ordernum = rand(1, 9000)
 
-	for(var/typepath in subtypesof(/datum/supply_packs))
-		var/datum/supply_packs/P = new typepath()
-		if(P.name == "HEADER") continue		// To filter out group headers
-		supply_packs["[P.type]"] = P
+	for(var/pack in subtypesof(/datum/supply_pack))
+		var/datum/supply_pack/P = new pack()
+		if(!P.contains)
+			continue
+		supply_packs[P.type] = P
+
 	initial_move()
 	..()
 
 
 /datum/subsystem/shuttle/fire()
-	points += points_per_decisecond * wait
 	for(var/thing in mobile)
 		if(thing)
 			var/obj/docking_port/mobile/P = thing
@@ -210,3 +210,4 @@ var/datum/subsystem/shuttle/SSshuttle
 				S.dwidth = M.dwidth
 				S.dheight = M.dheight
 		moveShuttle(M.id, "[M.roundstart_move]", 0)
+		CHECK_TICK

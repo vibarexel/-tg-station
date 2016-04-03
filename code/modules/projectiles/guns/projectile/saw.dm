@@ -7,7 +7,7 @@
 	slot_flags = 0
 	origin_tech = "combat=5;materials=1;syndicate=2"
 	mag_type = /obj/item/ammo_box/magazine/mm556x45
-	heavy_weapon = 1
+	weapon_weight = WEAPON_MEDIUM
 	fire_sound = 'sound/weapons/Gunshot_smg.ogg'
 	var/cover_open = 0
 	can_suppress = 0
@@ -26,7 +26,7 @@
 
 
 /obj/item/weapon/gun/projectile/automatic/l6_saw/update_icon()
-	icon_state = "l6[cover_open ? "open" : "closed"][magazine ? Ceiling(get_ammo(0)/12.5)*25 : "-empty"]"
+	icon_state = "l6[cover_open ? "open" : "closed"][magazine ? Ceiling(get_ammo(0)/12.5)*25 : "-empty"][suppressed ? "-suppressed" : ""]"
 	item_state = "l6[cover_open ? "openmag" : "closedmag"]"
 
 
@@ -55,6 +55,9 @@
 
 
 /obj/item/weapon/gun/projectile/automatic/l6_saw/attackby(obj/item/A, mob/user, params)
+	. = ..()
+	if(.)
+		return
 	if(!cover_open)
 		user << "<span class='warning'>[src]'s cover is closed! You can't insert a new mag.</span>"
 		return

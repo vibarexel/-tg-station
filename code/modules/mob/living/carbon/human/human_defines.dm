@@ -22,7 +22,7 @@
 	var/underwear = "Nude"	//Which underwear the player wants
 	var/undershirt = "Nude" //Which undershirt the player wants
 	var/socks = "Nude" //Which socks the player wants
-	var/backbag = 1		//Which backpack type the player has chosen. Backpack.or Satchel
+	var/backbag = DBACKPACK		//Which backpack type the player has chosen.
 
 	//Equipment slots
 	var/obj/item/wear_suit = null
@@ -53,3 +53,5 @@
 	var/name_override //For temporary visible name changes
 
 	var/heart_attack = 0
+
+	var/drunkenness = 0 //Overall drunkenness - check handle_alcohol() in life.dm for effects

@@ -49,172 +49,15 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 	var/image/photo = null //Scanned photo
 
-/obj/item/device/pda/medical
-	default_cartridge = /obj/item/weapon/cartridge/medical
-	icon_state = "pda-medical"
 
-/obj/item/device/pda/viro
-	default_cartridge = /obj/item/weapon/cartridge/medical
-	icon_state = "pda-virology"
-
-/obj/item/device/pda/engineering
-	default_cartridge = /obj/item/weapon/cartridge/engineering
-	icon_state = "pda-engineer"
-
-/obj/item/device/pda/security
-	default_cartridge = /obj/item/weapon/cartridge/security
-	icon_state = "pda-security"
-
-/obj/item/device/pda/detective
-	default_cartridge = /obj/item/weapon/cartridge/detective
-	icon_state = "pda-detective"
-
-/obj/item/device/pda/warden
-	default_cartridge = /obj/item/weapon/cartridge/security
-	icon_state = "pda-warden"
-
-/obj/item/device/pda/janitor
-	default_cartridge = /obj/item/weapon/cartridge/janitor
-	icon_state = "pda-janitor"
-	ttone = "slip"
-
-/obj/item/device/pda/toxins
-	default_cartridge = /obj/item/weapon/cartridge/signal/toxins
-	icon_state = "pda-science"
-	ttone = "boom"
-
-/obj/item/device/pda/clown
-	default_cartridge = /obj/item/weapon/cartridge/clown
-	icon_state = "pda-clown"
-	desc = "A portable microcomputer by Thinktronic Systems, LTD. The surface is coated with polytetrafluoroethylene and banana drippings."
-	ttone = "honk"
-
-/obj/item/device/pda/mime
-	default_cartridge = /obj/item/weapon/cartridge/mime
-	icon_state = "pda-mime"
-	silent = 1
-	ttone = "silence"
-
-/obj/item/device/pda/heads
-	default_cartridge = /obj/item/weapon/cartridge/head
-	icon_state = "pda-hop"
-
-/obj/item/device/pda/heads/hop
-	default_cartridge = /obj/item/weapon/cartridge/hop
-	icon_state = "pda-hop"
-
-/obj/item/device/pda/heads/hos
-	default_cartridge = /obj/item/weapon/cartridge/hos
-	icon_state = "pda-hos"
-
-/obj/item/device/pda/heads/ce
-	default_cartridge = /obj/item/weapon/cartridge/ce
-	icon_state = "pda-ce"
-
-/obj/item/device/pda/heads/cmo
-	default_cartridge = /obj/item/weapon/cartridge/cmo
-	icon_state = "pda-cmo"
-
-/obj/item/device/pda/heads/rd
-	default_cartridge = /obj/item/weapon/cartridge/rd
-	icon_state = "pda-rd"
-
-/obj/item/device/pda/captain
-	default_cartridge = /obj/item/weapon/cartridge/captain
-	icon_state = "pda-captain"
-	detonate = 0
-
-/obj/item/device/pda/cargo
-	default_cartridge = /obj/item/weapon/cartridge/quartermaster
-	icon_state = "pda-cargo"
-
-/obj/item/device/pda/quartermaster
-	default_cartridge = /obj/item/weapon/cartridge/quartermaster
-	icon_state = "pda-qm"
-
-/obj/item/device/pda/shaftminer
-	icon_state = "pda-miner"
-
-/obj/item/device/pda/syndicate
-	default_cartridge = /obj/item/weapon/cartridge/syndicate
-	icon_state = "pda-syndi"
-	name = "military PDA"
-	owner = "John Doe"
-	hidden = 1
-
-/obj/item/device/pda/chaplain
-	icon_state = "pda-chaplain"
-	ttone = "holy"
-
-/obj/item/device/pda/lawyer
-	default_cartridge = /obj/item/weapon/cartridge/lawyer
-	icon_state = "pda-lawyer"
-	ttone = "objection"
-
-/obj/item/device/pda/botanist
-	//default_cartridge = /obj/item/weapon/cartridge/botanist
-	icon_state = "pda-hydro"
-
-/obj/item/device/pda/roboticist
-	icon_state = "pda-roboticist"
-	default_cartridge = /obj/item/weapon/cartridge/roboticist
-
-/obj/item/device/pda/librarian
-	icon_state = "pda-library"
-	icon_alert = "pda-r-library"
-	default_cartridge = /obj/item/weapon/cartridge/librarian
-	desc = "A portable microcomputer by Thinktronic Systems, LTD. This is model is a WGW-11 series e-reader."
-	note = "Congratulations, your station has chosen the Thinktronic 5290 WGW-11 Series E-reader and Personal Data Assistant!"
-	silent = 1 //Quiet in the library!
-
-/obj/item/device/pda/clear
-	icon_state = "pda-clear"
-	desc = "A portable microcomputer by Thinktronic Systems, LTD. This is model is a special edition with a transparent case."
-	note = "Congratulations, you have chosen the Thinktronic 5230 Personal Data Assistant Deluxe Special Max Turbo Limited Edition!"
-
-/obj/item/device/pda/cook
-	icon_state = "pda-cook"
-
-/obj/item/device/pda/bar
-	icon_state = "pda-bartender"
-
-/obj/item/device/pda/atmos
-	default_cartridge = /obj/item/weapon/cartridge/atmos
-	icon_state = "pda-atmos"
-
-/obj/item/device/pda/chemist
-	default_cartridge = /obj/item/weapon/cartridge/chemistry
-	icon_state = "pda-chemistry"
-
-/obj/item/device/pda/geneticist
-	default_cartridge = /obj/item/weapon/cartridge/medical
-	icon_state = "pda-genetics"
-
-// Special AI/pAI PDAs that cannot explode.
-/obj/item/device/pda/ai
-	icon_state = "NONE"
-	ttone = "data"
-	fon = 0
-	detonate = 0
-
-/obj/item/device/pda/ai/attack_self(mob/user)
-	if ((honkamt > 0) && (prob(60)))//For clown virus.
-		honkamt--
-		playsound(loc, 'sound/items/bikehorn.ogg', 30, 1)
-	return
-
-/obj/item/device/pda/ai/pai
-	ttone = "assist"
-
-/*
- *	The Actual PDA
- */
 /obj/item/device/pda/pickup(mob/user)
+	..()
 	if(fon)
 		SetLuminosity(0)
 		user.AddLuminosity(f_lum)
 
 /obj/item/device/pda/dropped(mob/user)
+	..()
 	if(fon)
 		user.AddLuminosity(-f_lum)
 		SetLuminosity(f_lum)
@@ -262,13 +105,12 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 	var/dat = "<html><head><title>Personal Data Assistant</title></head><body bgcolor=\"#808000\"><style>a, a:link, a:visited, a:active, a:hover { color: #000000; }img {border-style:none;}</style>"
 
-	dat += "<a href='byond://?src=\ref[src];choice=Close'><img src=pda_exit.png> Close</a>"
+	dat += "<a href='byond://?src=\ref[src];choice=Refresh'><img src=pda_refresh.png> Refresh</a>"
 
 	if ((!isnull(cartridge)) && (mode == 0))
 		dat += " | <a href='byond://?src=\ref[src];choice=Eject'><img src=pda_eject.png> Eject [cartridge]</a>"
 	if (mode)
 		dat += " | <a href='byond://?src=\ref[src];choice=Return'><img src=pda_menu.png> Return</a>"
-	dat += " | <a href='byond://?src=\ref[src];choice=Refresh'><img src=pda_refresh.png> Refresh</a>"
 
 	dat += "<br>"
 
@@ -426,8 +268,8 @@ var/global/list/obj/item/device/pda/PDAs = list()
 					if (total_moles)
 						for(var/id in env_gases)
 							var/gas_level = env_gases[id][MOLES]/total_moles
-							if(id in hardcoded_gases || gas_level > 0.01)
-								dat += "[env_gases[id][GAS_META][META_GAS_NAME]]: [round(gas_level*100)]%<br>"
+							if(id in hardcoded_gases || gas_level > 0.001)
+								dat += "[env_gases[id][GAS_META][META_GAS_NAME]]: [round(gas_level*100, 0.01)]%<br>"
 
 					dat += "Temperature: [round(environment.temperature-T0C)]&deg;C<br>"
 				dat += "<br>"
@@ -436,7 +278,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 				dat += cart
 
 	dat += "</body></html>"
-	user << browse(dat, "window=pda;size=400x444;border=1;can_resize=1;can_close=0;can_minimize=0")
+	user << browse(dat, "window=pda;size=400x450;border=1;can_resize=1;can_minimize=0")
 	onclose(user, "pda", src)
 
 /obj/item/device/pda/Topic(href, href_list)
@@ -444,7 +286,7 @@ var/global/list/obj/item/device/pda/PDAs = list()
 	var/mob/living/U = usr
 	//Looking for master was kind of pointless since PDAs don't appear to have one.
 
-	if(usr.canUseTopic(src))
+	if(usr.canUseTopic(src) && !href_list["close"])
 		add_fingerprint(U)
 		U.set_machine(src)
 
@@ -452,10 +294,6 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 //BASIC FUNCTIONS===================================
 
-			if("Close")//Self explanatory
-				U.unset_machine()
-				U << browse(null, "window=pda")
-				return
 			if("Refresh")//Refresh, goes to the end of the proc.
 			if("Return")//Return
 				if(mode<=9)
@@ -1010,34 +848,27 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 
 /obj/item/device/pda/proc/explode() //This needs tuning.
-	if(!src.detonate) return
-	var/turf/T = get_turf(src.loc)
+	if(!detonate) return
+	var/turf/T = get_turf(src)
 
 	if (ismob(loc))
 		var/mob/M = loc
-		M.show_message("<span class='danger'>Your [src] explodes!</span>", 1)
+		M.show_message("<span class='userdanger'>Your [src] explodes!</span>", 1)
+	else
+		visible_message("<span class='danger'>[src] explodes!</span>", "<span class='warning'>You hear a loud *pop*!</span>")
 
 	if(T)
 		T.hotspot_expose(700,125)
-
-		explosion(T, -1, -1, 2, 3)
-
+		if(istype(cartridge, /obj/item/weapon/cartridge/syndicate))
+			explosion(T, -1, 1, 3, 4)
+		else
+			explosion(T, -1, -1, 2, 3)
 	qdel(src)
 	return
 
 /obj/item/device/pda/Destroy()
 	PDAs -= src
 	return ..()
-
-/obj/item/device/pda/clown/Crossed(AM as mob|obj) //Clown PDA is slippery.
-	if (istype(AM, /mob/living/carbon))
-		var/mob/living/carbon/M = AM
-		if(M.slip(8, 5, src, NO_SLIP_WHEN_WALKING))
-			if (ishuman(M) && (M.real_name != src.owner))
-				if (istype(src.cartridge, /obj/item/weapon/cartridge/clown))
-					var/obj/item/weapon/cartridge/clown/cart = src.cartridge
-					if(cart.honk_charges < 5)
-						cart.honk_charges++
 
 //AI verb and proc for sending PDA messages.
 

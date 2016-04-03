@@ -24,8 +24,6 @@
 	var/obj/screen/deity_follower_display
 
 	var/obj/screen/nightvisionicon
-	var/obj/screen/r_hand_hud_object
-	var/obj/screen/l_hand_hud_object
 	var/obj/screen/action_intent
 	var/obj/screen/zone_select
 	var/obj/screen/pull_icon
@@ -37,6 +35,7 @@
 	var/list/obj/screen/hotkeybuttons = list() //the buttons that can be used via hotkeys
 	var/list/infodisplay = list() //the screen objects that display mob info (health, alien plasma, etc...)
 	var/list/screenoverlays = list() //the screen objects used as whole screen overlays (flash, damageoverlay, etc...)
+	var/list/inv_slots[slots_amt] // /obj/screen/inventory objects, ordered by their slot ID.
 
 	var/obj/screen/movable/action_button/hide_toggle/hide_actions_toggle
 	var/action_buttons_hidden = 0
@@ -47,6 +46,8 @@
 
 /datum/hud/New(mob/owner)
 	mymob = owner
+	hide_actions_toggle = new
+	hide_actions_toggle.InitialiseIcon(mymob)
 
 /datum/hud/Destroy()
 	if(mymob.hud_used == src)
@@ -63,8 +64,7 @@
 			qdel(thing)
 		static_inventory.Cut()
 
-	r_hand_hud_object = null
-	l_hand_hud_object = null
+	inv_slots.Cut()
 	action_intent = null
 	zone_select = null
 	pull_icon = null
@@ -105,8 +105,8 @@
 	return ..()
 
 /mob/proc/create_mob_hud()
-	return
-
+	if(client && !hud_used)
+		hud_used = new /datum/hud(src)
 
 //Version denotes which style should be displayed. blank or 0 means "next version"
 /datum/hud/proc/show_hud(version = 0)
@@ -135,6 +135,8 @@
 			if(infodisplay.len)
 				mymob.client.screen += infodisplay
 
+			mymob.client.screen += hide_actions_toggle
+
 			if(action_intent)
 				action_intent.screen_loc = initial(action_intent.screen_loc) //Restore intent selection to the original position
 
@@ -150,10 +152,10 @@
 				mymob.client.screen += infodisplay
 
 			//These ones are a part of 'static_inventory', 'toggleable_inventory' or 'hotkeybuttons' but we want them to stay
-			if(l_hand_hud_object)
-				mymob.client.screen += l_hand_hud_object	//we want the hands to be visible
-			if(r_hand_hud_object)
-				mymob.client.screen += r_hand_hud_object	//we want the hands to be visible
+			if(inv_slots[slot_l_hand])
+				mymob.client.screen += inv_slots[slot_l_hand]	//we want the hands to be visible
+			if(inv_slots[slot_r_hand])
+				mymob.client.screen += inv_slots[slot_r_hand]	//we want the hands to be visible
 			if(action_intent)
 				mymob.client.screen += action_intent		//we want the intent switcher visible
 				action_intent.screen_loc = ui_acti_alt	//move this to the alternative position, where zone_select usually is.
@@ -171,8 +173,9 @@
 
 	hud_version = display_hud_version
 	persistant_inventory_update()
-	mymob.update_action_buttons()
+	mymob.update_action_buttons(1)
 	reorganize_alerts()
+	mymob.reload_fullscreen()
 
 
 /datum/hud/human/show_hud(version = 0)
