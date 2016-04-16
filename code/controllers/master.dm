@@ -86,6 +86,11 @@ var/global/datum/controller/master/Master = new()
 	else
 		make_mining_asteroid_secrets()
 
+	// deep space ruins
+	seedRuins(7, rand(0,2), /area/space, space_ruins_templates)
+	seedRuins(8, rand(0,2), /area/space, space_ruins_templates)
+	seedRuins(9, rand(0,2), /area/space, space_ruins_templates)
+
 	// Set up Z-level transistions.
 	setup_map_transitions()
 
@@ -206,7 +211,10 @@ var/global/datum/controller/master/Master = new()
 								if(newwait < oldwait)
 									newwait = MC_AVERAGE(oldwait, newwait)
 								SS.wait = Clamp(newwait, SS.dwait_lower, SS.dwait_upper)
-								SS.next_fire = world.time + SS.wait
+								if(SS.paused)
+									SS.next_fire = world.time //run it next tick if we can, but don't priority queue it, as we are a dynamic wait subsystem
+								else //not paused, it ran all the way thru, normal wait time
+									SS.next_fire = world.time + SS.wait
 							else
 								if(!paused)
 									SS.next_fire += SS.wait

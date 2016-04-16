@@ -10,6 +10,7 @@
 	name = null
 	icon = 'icons/obj/power.dmi'
 	anchored = 1
+	on_blueprints = TRUE
 	var/datum/powernet/powernet = null
 	use_power = 0
 	idle_power_usage = 0
@@ -120,7 +121,7 @@
 
 		var/turf/T = user.loc
 
-		if(T.intact || !istype(T, /turf/simulated/floor))
+		if(T.intact || !istype(T, /turf/open/floor))
 			return
 
 		if(get_dist(src, user) > 1)

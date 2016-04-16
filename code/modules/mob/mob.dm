@@ -7,6 +7,9 @@
 		spellremove(src)
 	for(var/infection in viruses)
 		qdel(infection)
+	for(var/cc in client_colours)
+		qdel(cc)
+	client_colours = null
 	ghostize()
 	return ..()
 
@@ -584,21 +587,10 @@ var/next_mob_id = 0
 		if (nextmap && istype(nextmap))
 			stat(null, "Next Map: [nextmap.friendlyname]")
 		stat(null, "Server Time: [time2text(world.realtime, "YYYY-MM-DD hh:mm")]")
-		var/ETA
-		switch(SSshuttle.emergency.mode)
-			if(SHUTTLE_RECALL)
-				ETA = "RCL"
-			if(SHUTTLE_CALL)
-				ETA = "ETA"
-			if(SHUTTLE_DOCKED)
-				ETA = "ETD"
-			if(SHUTTLE_ESCAPE)
-				ETA = "ESC"
-			if(SHUTTLE_STRANDED)
-				ETA = "ERR"
+
+		var/ETA = SSshuttle.emergency.getModeStr()
 		if(ETA)
-			var/timeleft = SSshuttle.emergency.timeLeft()
-			stat(null, "[ETA]-[(timeleft / 60) % 60]:[add_zero(num2text(timeleft % 60), 2)]")
+			stat(null, "[ETA] [SSshuttle.emergency.getTimerStr()]")
 
 
 	if(client && client.holder)
